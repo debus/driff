@@ -11,6 +11,7 @@
 #include "chunk_header.hpp"
 #include <map>
 #include <vector>
+#include <string>
 #include "serializable.hpp"
 namespace debus{namespace riff{
 
@@ -69,7 +70,12 @@ public:
 			delete *it;
 		}
 	};
-
+	std::string idToString(){
+		char cstr[5];
+		*((unsigned int*)cstr) = this->ckID;
+		cstr[4] = '\0';
+		return std::string(cstr);
+	};
 	smart_chunk_t* getFirstChunkByID(id_type id) const {
 		D_CCHUNK_LOOP(it,sub_chunks){
 			if((*it)->ckID == id){
