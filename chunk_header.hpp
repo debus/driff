@@ -15,9 +15,8 @@ struct chunk_header_t{
 	typedef unsigned int id_type;
 
 	id_type ckID;
-	unsigned int ckSize;
 
-	static const unsigned int written_size = (sizeof(ckID) + sizeof(ckSize));
+	static const unsigned int written_size = (sizeof(ckID) + sizeof(unsigned int));
 };
 
 };

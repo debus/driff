@@ -38,12 +38,10 @@ class smart_chunk_t : public chunk_header_t{
 public:
 	smart_chunk_t(){
 		this->ckID = -1;
-		this->ckSize = 0;
 	};
 
 	smart_chunk_t(id_type id, unsigned int size){
 		this->ckID = id;
-		this->ckSize = size;
 	};
 
 	virtual ~smart_chunk_t(){
@@ -107,8 +105,10 @@ public:
 
 class unknown_chunk_t : public smart_chunk_t{
 public:
+  unsigned int ckSize;
 	char* data;
-	unknown_chunk_t(id_type id, unsigned int size){
+	unknown_chunk_t(id_type id, unsigned int size) : smart_chunk_t(id,size){
+    ckSize = size;
 		if(size != 0){
 			data = new char[size];
 		} else {
@@ -117,11 +117,16 @@ public:
 	}
 
 	virtual ~unknown_chunk_t(){
+    this->removeSubChunks();
 		if(data != NULL){
 			delete[] data;
 			data = NULL;
 		}
 	}
+
+  virtual unsigned int getChunkSize(){
+    return this->ckSize;
+  }
 
 	static smart_chunk_t* create(id_type id, unsigned int size){
 		return new unknown_chunk_t(id,size);

@@ -10,6 +10,6 @@ int main(){
   smart_chunk_t* chunk = smart_chunk_t::readChunk(file,map);
 
   cout<<"ckID: "<<chunk->ckID<<" '"<<chunk->idToString()<<"'"<<endl;
-  cout<<"ckSize: "<<chunk->ckSize<<" ("<<chunk->getChunkSize()<<")"<<endl;
+  cout<<"ckSize: "<<"("<<chunk->getChunkSize()<<")"<<endl;
   return 0;
 }
