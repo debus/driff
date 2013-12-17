@@ -30,6 +30,10 @@ public:
     if(chunk == NULL || pos > children.size()){ return NULL; }
     
   }
+
+  virtual bool supportsChildren(){
+    return true;
+  };
 };
 
 }};
