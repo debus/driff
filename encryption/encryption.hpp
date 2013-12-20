@@ -3,16 +3,6 @@
 
 namespace debus{namespace encryption{
 
-class AES{
-  
-  void KeyExpansion(){};
-  void AddRoundKey(){};
-  void SubBytes(){};
-  void ShiftRows(){};
-  void MixColumns(){};
-
-};
-
 }};
 
 #endif
