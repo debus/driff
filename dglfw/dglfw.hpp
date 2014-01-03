@@ -3,6 +3,7 @@
 #include <string.h> 
 #include <vector>
 #include "window.hpp"
+#include "error.hpp"
 namespace debus{namespace dglfw{
   int dglfwInit(){
     return glfwInit();

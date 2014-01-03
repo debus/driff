@@ -5,12 +5,14 @@
 using namespace debus::dglfw;
 
 void printMonitorInfo();
-
+void error_function(error_handling::ERROR_CODE code, const char* message);
 int main(int argc, char** argv){
   if(!dglfwInit()){
     fprintf(stderr, "Failed to initialize DWindow\n");
     return 1;
   } 
+
+  error_handling::setErrorCallback(error_function);
 
   printMonitorInfo();
 
@@ -56,3 +58,7 @@ void printMonitorInfo(){
     printf("\t\tGammaSize: %d\n", it->getGammaRamp()->size);
   }
 }
+
+void error_function(error_handling::ERROR_CODE code, const char* message){
+  fprintf(stderr, "Error (%d) '%s'\n", code, message);
+};
