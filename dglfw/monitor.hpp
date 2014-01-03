@@ -4,11 +4,14 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <vector>
-
 namespace debus{namespace dglfw{
 
 typedef GLFWvidmode DVideoMode;
 typedef GLFWgammaramp DGammaRamp;
+
+bool operator ==(const DVideoMode& lhs, const DVideoMode& rhs){
+  return memcmp(&lhs,&rhs,sizeof(DVideoMode)) == 0;
+}
 
 class DMonitor{
   GLFWmonitor* monitor;
@@ -39,19 +42,31 @@ public:
 
   void getPhysicalSize(int* width, int* height){
     glfwGetMonitorPhysicalSize(this->monitor,width,height);
-  }
+  };
 
-  std::vector<const DVideoMode*> getVideoModes(){
-    std::vector<const DVideoMode*> list;
+  const DGammaRamp* getGammaRamp(){
+    return glfwGetGammaRamp(this->monitor);
+  };
+
+  void setGammaRamp(const DGammaRamp* ramp){
+    glfwSetGammaRamp(this->monitor,ramp);
+  };
+
+  void setGamma(float gamma){
+    glfwSetGamma(this->monitor,gamma);
+  };
+
+  std::vector<DVideoMode> getVideoModes(){
     int end = 0;
     const DVideoMode* modes = glfwGetVideoModes(this->monitor, &end);
     if(end == 0 || modes == NULL){
-      return list;
+      return std::vector<DVideoMode>();
     }
-    end *= sizeof(modes);
-    end += (int)modes; 
-    for(; modes < (DVideoMode*)end; ++modes){
-      list.push_back(modes);
+    std::vector<DVideoMode> list;
+    list.reserve(end);
+    end = (int) &modes[end];
+    for(; modes != (DVideoMode*)end; ++modes){
+      list.push_back(*modes);
     }
     return list;
   };
@@ -64,9 +79,9 @@ public:
     if(end == 0 || arr == NULL){
       return list;
     }
-    end *= sizeof(arr);
-    end += (int)arr;
-    for(; arr < (GLFWmonitor**)end; ++arr){
+    list.reserve(end);
+    end = (int)&arr[end];
+    for(; arr != (GLFWmonitor**)end; ++arr){
       list.push_back(DMonitor(*arr));
     }
     return list;
