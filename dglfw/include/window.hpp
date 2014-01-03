@@ -57,41 +57,71 @@ public:
 };
 
 
-
 class DWindow{
   GLFWwindow* windowHandle;
+
+protected:
+  void __setUserPointer(){
+    glfwSetWindowUserPointer(windowHandle, (void*)this);
+  };
+  
+  static void DWindowFromGLFWwindow(GLFWwindow* handle, DWindow** ptr){
+    if(ptr == NULL || handle == NULL){ return; }
+    *ptr =  (DWindow*)glfwGetWindowUserPointer(handle);
+  };
+
 public:
   void* userPointer;
   DWindow(){
     windowHandle = NULL;
     userPointer = NULL;
   }
+  
+  DWindow(GLFWwindow* window){
+    windowHandle = window;
+  };
+
   operator GLFWwindow*() const{
     return this->windowHandle;
   };
 
   bool createWindow(int width, int height, const char* title){
     windowHandle = glfwCreateWindow(width, height, title, NULL, NULL);
-    return windowHandle != NULL;
+    if(windowHandle != NULL){
+      __setUserPointer();
+      return true;
+    }
+    return false;
   };
 
   bool createWindow(int width, int height, const char* title, const DMonitor& monitor){
     windowHandle = glfwCreateWindow(width, height, title, monitor, NULL);
-    return windowHandle != NULL;
+    if(windowHandle != NULL){
+      __setUserPointer();
+      return true;
+    }
+    return false;
   };
 
   bool createWindow(int width, int height, const char* title, const DWindow& share){
     windowHandle = glfwCreateWindow(width, height, title, NULL, share);
-    return windowHandle != NULL;
+    if(windowHandle != NULL){
+      __setUserPointer();
+      return true;
+    }
+    return false;
   };
 
   bool createWindow(int width, int height, const char* title, const DMonitor& monitor, const DWindow& share){
     windowHandle = glfwCreateWindow(width, height, title, monitor, share);
-    return windowHandle != NULL;
+    if(windowHandle != NULL){
+      __setUserPointer();
+      return true;
+    }
+    return false;
   };
 
 };
-
 
 }}};
 
