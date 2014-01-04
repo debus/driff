@@ -6,6 +6,10 @@ using namespace debus::dglfw;
 
 void printMonitorInfo();
 void error_function(error_handling::ERROR_CODE code, const char* message);
+void mouse_callback(window::DWindow*,MouseButton,ButtonAction,ModifierKeys);
+void key_callback(window::DWindow*,KeyboardKey,ScanCode,ButtonAction,ModifierKeys);
+void cursor_pos_callback(window::DWindow*,double,double);
+
 int main(int argc, char** argv){
   if(!dglfwInit()){
     fprintf(stderr, "Failed to initialize DWindow\n");
@@ -24,7 +28,12 @@ int main(int argc, char** argv){
     dglfwTerminate();
     return -1;
   }
-  getchar();
+  window.setMouseButtonCallback(mouse_callback);
+  window.setKeyCallback(key_callback);
+  window.setCursorPosCallback(cursor_pos_callback);
+  while(!window.windowShouldClose()){
+    glfwPollEvents();
+  }
   return 0;
 }
 
@@ -62,3 +71,19 @@ void printMonitorInfo(){
 void error_function(error_handling::ERROR_CODE code, const char* message){
   fprintf(stderr, "Error (%d) '%s'\n", code, message);
 };
+
+
+void mouse_callback(window::DWindow* window,MouseButton button,ButtonAction action,ModifierKeys mods){
+  printf("Mouse pressed: %d,%d,%d\n",button,action,mods);
+}
+
+void key_callback(window::DWindow* window, KeyboardKey key, ScanCode scancode, ButtonAction action, ModifierKeys mods){
+  if(key == DGLFW_KEY_ESCAPE){
+    window->setWindowShouldClose(true);
+  }
+  printf("Key pressed: %d,%d,%d,%d\n",key,scancode,action,mods);
+}
+
+void cursor_pos_callback(window::DWindow*,double x,double y){
+  printf("Cursor pos: %f,%f\n",x,y);
+}

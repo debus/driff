@@ -1,13 +1,20 @@
-#ifndef DEBUS_H_GRAPHICS_H_SUBED
-#define DEBUS_H_GRAPHICS_H_SUBED
+#ifndef _INCLUDE_GUARD_7FC0379A_2760_400C_AD36_0F4502D626DA
+#define _INCLUDE_GUARD_7FC0379A_2760_400C_AD36_0F4502D626DA
+
 #include <string.h> 
 #include <vector>
 #include "window.hpp"
+#include "monitor.hpp"
 #include "error.hpp"
-#include "input.hpp"
 namespace debus{namespace dglfw{
+
+  void dglfwTerminate();
+
   int dglfwInit(){
-    return glfwInit();
+    int ret = glfwInit();
+    if(!ret)
+      dglfwTerminate();
+    return ret;
   }
 
   void dglfwTerminate(){
@@ -16,4 +23,5 @@ namespace debus{namespace dglfw{
 
 }};
 
-#endif
+#endif // _INCLUDE_GUARD_7FC0379A_2760_400C_AD36_0F4502D626DA
+

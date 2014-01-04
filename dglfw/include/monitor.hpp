@@ -1,13 +1,10 @@
 #ifndef _INCLUDE_GUARD_49144D1F_D955_407D_AECD_9437AFDD6B4B
 #define _INCLUDE_GUARD_49144D1F_D955_407D_AECD_9437AFDD6B4B
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "forward_declare.hpp"
 #include <glm/glm.hpp>
 #include <vector>
 namespace debus{namespace dglfw{
-
-typedef GLFWvidmode DVideoMode;
-typedef GLFWgammaramp DGammaRamp;
 
 bool operator ==(const DVideoMode& lhs, const DVideoMode& rhs){
   return memcmp(&lhs,&rhs,sizeof(DVideoMode)) == 0;
