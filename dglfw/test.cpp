@@ -9,8 +9,12 @@ void error_function(error_handling::ERROR_CODE code, const char* message);
 void mouse_callback(window::DWindow*,MouseButton,ButtonAction,ModifierKeys);
 void key_callback(window::DWindow*,KeyboardKey,ScanCode,ButtonAction,ModifierKeys);
 void cursor_pos_callback(window::DWindow*,double,double);
+void window_close_callback(window::DWindow*);
+void window_rect_callback(window::DWindow*,int,window::WindowRect);
+
 double cx = 0.0;
 double cy = 0.0;
+bool changed = false;
 int main(int argc, char** argv){
   if(!dglfwInit()){
     fprintf(stderr, "Failed to initialize DWindow\n");
@@ -29,10 +33,12 @@ int main(int argc, char** argv){
     dglfwTerminate();
     return -1;
   }
-  glfwMakeContextCurrent((GLFWwindow*)window);
+  window.makeContextCurrent();
   window.setMouseButtonCallback(mouse_callback);
   window.setKeyCallback(key_callback);
-  window.setCursorPosCallback(cursor_pos_callback);
+  //window.setCursorPosCallback(cursor_pos_callback);
+  window.setCloseCallback(window_close_callback);
+  window.setRectChangeCallback(window_rect_callback);
   double lastTime = glfwGetTime();
   int nbFrames = 0;
   while(!window.windowShouldClose()){
@@ -65,6 +71,15 @@ int main(int argc, char** argv){
       printf("%f fps\n",double(nbFrames)/(time-lastTime));
       nbFrames = 0;
       lastTime = time;
+    }
+    if(changed){
+      changed = false;
+      window::WindowRect cur;
+      window.getWindowRect(&cur);
+      printf("changed: %d,%d\n", cur.x,cur.y); 
+      int x,y;
+      glfwGetWindowPos((GLFWwindow*)window, &x, &y);
+      printf("changed: %d,%d\n", x,y); 
     }
   }
   return 0;
@@ -113,6 +128,10 @@ void mouse_callback(window::DWindow* window,MouseButton button,ButtonAction acti
 void key_callback(window::DWindow* window, KeyboardKey key, ScanCode scancode, ButtonAction action, ModifierKeys mods){
   if(key == DGLFW_KEY_ESCAPE){
     window->setWindowShouldClose(true);
+  }else if(key == DGLFW_KEY_A){
+    window::WindowRect rect;
+    window->getWindowRect(&rect);
+    window->setWindowRect(&rect);
   }
   printf("Key pressed: %d,%d,%d,%d\n",key,scancode,action,mods);
 }
@@ -121,4 +140,23 @@ void cursor_pos_callback(window::DWindow*,double x,double y){
   printf("Cursor pos: %f,%f\n",x,y);
   cx = x;
   cy = y;
+}
+
+void window_close_callback(window::DWindow* window){
+  printf("Window closing!\n");
+}
+
+void window_rect_callback(window::DWindow* window, int whatChanged,window::WindowRect rect){
+  window::WindowRect cur;
+  window->getWindowRect(&cur);
+  if(whatChanged == DGLFW_WINDOW_SIZE_CHANGED){
+    printf("Window Size Changed: current: %d,%d passed: %d,%d\n", cur.width,cur.height,rect.width,rect.height);
+  }else{
+    printf("Window Pos Changed: current: %d,%d passed: %d,%d\n", cur.x,cur.y,rect.x,rect.y);
+    cur.x = rect.x;
+    cur.y = rect.y;
+    window->setWindowRect(&cur);
+    changed = true;
+  }
+
 }

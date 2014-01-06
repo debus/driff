@@ -89,7 +89,12 @@ namespace debus{namespace dglfw{namespace window{
     }
 
     DWindow(GLFWwindow* window){
-      windowHandle = window;
+      __setWindowHandle(window);
+    };
+
+    ~DWindow(){
+      glfwDestroyWindow(this->windowHandle);
+      this->windowHandle = NULL;
     };
 
     operator GLFWwindow*() const{
@@ -115,10 +120,53 @@ namespace debus{namespace dglfw{namespace window{
     void setWindowShouldClose(bool should_close){
       glfwSetWindowShouldClose((GLFWwindow*)*this,(int)should_close);
     };
-    
+   
+    DMonitor getWindowMonitor(){
+      glfwGetWindowMonitor(this->windowHandle);
+    };
+
     bool windowShouldClose(){
       return (bool)glfwWindowShouldClose((GLFWwindow*)*this);
     };
+
+    void makeContextCurrent(){
+      glfwMakeContextCurrent(this->windowHandle);
+    };
+    
+    void swapBuffers(){
+      glfwSwapBuffers(this->windowHandle);
+    };
+
+    void restoreWindow(){
+      glfwRestoreWindow(this->windowHandle);
+    };  
+    
+    void showWindow(){
+      glfwShowWindow(this->windowHandle);
+    };
+
+    void hideWindow(){
+      glfwHideWindow(this->windowHandle);
+    };
+
+    void getWindowRect(WindowRect* rect){
+      if(rect != NULL){
+        glfwGetWindowPos(this->windowHandle, &rect->x, &rect->y);
+        glfwGetWindowSize(this->windowHandle, &rect->width, &rect->height);
+      }
+    };
+
+    void setWindowRect(const WindowRect* rect){
+      if(rect != NULL){
+        glfwSetWindowPos(this->windowHandle, rect->x, rect->y);
+        glfwSetWindowSize(this->windowHandle, rect->width, rect->height);
+      }
+    };
+
+    static DWindow getCurrentContext(){
+      return DWindow(glfwGetCurrentContext());
+    };
+
   };
 
 

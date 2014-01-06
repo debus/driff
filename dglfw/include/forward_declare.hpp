@@ -22,6 +22,14 @@
 #define DGLFW_WINDOW_MOUSE_BUTTON_CALLBACK 0
 #define DGLFW_WINDOW_KEY_CALLBACK (DGLFW_WINDOW_MOUSE_BUTTON_CALLBACK + 1)
 #define DGLFW_WINDOW_CURSOR_POS_CALLBACK (DGLFW_WINDOW_KEY_CALLBACK + 1)
+#define DGLFW_WINDOW_CLOSE_CALLBACK (DGLFW_WINDOW_CURSOR_POS_CALLBACK + 1)
+#define DGLFW_WINDOW_REFRESH_CALLBACK (DGLFW_WINDOW_CLOSE_CALLBACK + 1)
+#define DGLFW_WINDOW_FOCUS_CALLBACK (DGLFW_WINDOW_REFRESH_CALLBACK + 1)
+#define DGLFW_WINDOW_SIZE_CALLBACK (DGLFW_WINDOW_FOCUS_CALLBACK + 1) 
+#define DGLFW_WINDOW_POS_CALLBACK (DGLFW_WINDOW_SIZE_CALLBACK + 1)
+
+#define DGLFW_WINDOW_POSITION_CHANGED 1
+#define DGLFW_WINDOW_SIZE_CHANGED 2
 
 #include "keys.hpp"
 
@@ -31,11 +39,6 @@ namespace debus{namespace dglfw{
   typedef GLFWgammaramp DGammaRamp;
 
   class DMonitor;
-
-  namespace window{
-    class DWindowOptions;
-    class DWindow;
-  }; 
 
   typedef int MouseButton;
   typedef int ButtonAction; 
@@ -60,6 +63,27 @@ namespace debus{namespace dglfw{
 
   };
 
+  template<typename T>
+    struct RectBase{
+      T x,y;
+      T width, height;
+
+      template<typename D>
+        operator RectBase<D>(){
+          RectBase<D> ret;
+          ret.x = (D)this->x;
+          ret.y = (D)this->y;
+          ret.width = (D)this->width;
+          ret.height = (D)this->width;
+          return ret;
+        };
+    };
+
+  namespace window{
+    class DWindowOptions;
+    class DWindow;
+    typedef RectBase<int> WindowRect;
+  }; 
 
 
 }};
