@@ -9,7 +9,8 @@ void error_function(error_handling::ERROR_CODE code, const char* message);
 void mouse_callback(window::DWindow*,MouseButton,ButtonAction,ModifierKeys);
 void key_callback(window::DWindow*,KeyboardKey,ScanCode,ButtonAction,ModifierKeys);
 void cursor_pos_callback(window::DWindow*,double,double);
-
+double cx = 0.0;
+double cy = 0.0;
 int main(int argc, char** argv){
   if(!dglfwInit()){
     fprintf(stderr, "Failed to initialize DWindow\n");
@@ -28,11 +29,43 @@ int main(int argc, char** argv){
     dglfwTerminate();
     return -1;
   }
+  glfwMakeContextCurrent((GLFWwindow*)window);
   window.setMouseButtonCallback(mouse_callback);
   window.setKeyCallback(key_callback);
   window.setCursorPosCallback(cursor_pos_callback);
+  double lastTime = glfwGetTime();
+  int nbFrames = 0;
   while(!window.windowShouldClose()){
+    float ratio;
+    int width, height;
+    double time = glfwGetTime();
+    glfwGetFramebufferSize((GLFWwindow*)window, &width, &height);
+    ratio = width / (float) height;
+    glViewport(0, 0, width, height);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glRotatef((float) time * 50.f, 0.f, 0.f, 1.f);
+    glBegin(GL_TRIANGLES);
+    glColor3f(1.f, 0.f, 0.f);
+    glVertex3f(-0.6f, -0.4f, 0.f);
+    glColor3f(0.f, 1.f, 0.f);
+    glVertex3f(0.6f, -0.4f, 0.f);
+    glColor3f(0.f, 0.f, 1.f);
+    glVertex3f(cx/width, cy/height, 0.f);
+    glEnd();
+    glfwSwapBuffers((GLFWwindow*)window);
     glfwPollEvents();
+    ++nbFrames;
+    time = glfwGetTime();
+    if((time - lastTime) >= 10){
+      printf("%f fps\n",double(nbFrames)/(time-lastTime));
+      nbFrames = 0;
+      lastTime = time;
+    }
   }
   return 0;
 }
@@ -86,4 +119,6 @@ void key_callback(window::DWindow* window, KeyboardKey key, ScanCode scancode, B
 
 void cursor_pos_callback(window::DWindow*,double x,double y){
   printf("Cursor pos: %f,%f\n",x,y);
+  cx = x;
+  cy = y;
 }
