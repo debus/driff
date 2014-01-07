@@ -12,9 +12,11 @@ void cursor_pos_callback(window::DWindow*,double,double);
 void window_close_callback(window::DWindow*);
 void window_rect_callback(window::DWindow*,int,window::WindowRect);
 
+void testDWinInfoSpeed(window::DWindow*);
+
 double cx = 0.0;
 double cy = 0.0;
-bool changed = false;
+
 int main(int argc, char** argv){
   if(!dglfwInit()){
     fprintf(stderr, "Failed to initialize DWindow\n");
@@ -26,6 +28,7 @@ int main(int argc, char** argv){
   printMonitorInfo();
 
   window::DWindowOptions opts;
+  opts.setWindowDecorated(false);
   opts.applyOptions();
   window::DWindow window;
   if(!window.createWindow(800,600,"TEST WINDOW")){
@@ -33,12 +36,18 @@ int main(int argc, char** argv){
     dglfwTerminate();
     return -1;
   }
+  window::WindowRect correct;
+  window.getWindowRect(&correct);
+  correct.x = 150;
+  correct.y = 150;
+  window.setWindowRect(&correct);
   window.makeContextCurrent();
   window.setMouseButtonCallback(mouse_callback);
   window.setKeyCallback(key_callback);
   //window.setCursorPosCallback(cursor_pos_callback);
   window.setCloseCallback(window_close_callback);
   window.setRectChangeCallback(window_rect_callback);
+  testDWinInfoSpeed(&window);
   double lastTime = glfwGetTime();
   int nbFrames = 0;
   while(!window.windowShouldClose()){
@@ -63,7 +72,7 @@ int main(int argc, char** argv){
     glColor3f(0.f, 0.f, 1.f);
     glVertex3f(cx/width, cy/height, 0.f);
     glEnd();
-    glfwSwapBuffers((GLFWwindow*)window);
+    window.swapBuffers();
     glfwPollEvents();
     ++nbFrames;
     time = glfwGetTime();
@@ -71,15 +80,6 @@ int main(int argc, char** argv){
       printf("%f fps\n",double(nbFrames)/(time-lastTime));
       nbFrames = 0;
       lastTime = time;
-    }
-    if(changed){
-      changed = false;
-      window::WindowRect cur;
-      window.getWindowRect(&cur);
-      printf("changed: %d,%d\n", cur.x,cur.y); 
-      int x,y;
-      glfwGetWindowPos((GLFWwindow*)window, &x, &y);
-      printf("changed: %d,%d\n", x,y); 
     }
   }
   return 0;
@@ -126,14 +126,25 @@ void mouse_callback(window::DWindow* window,MouseButton button,ButtonAction acti
 }
 
 void key_callback(window::DWindow* window, KeyboardKey key, ScanCode scancode, ButtonAction action, ModifierKeys mods){
-  if(key == DGLFW_KEY_ESCAPE){
-    window->setWindowShouldClose(true);
-  }else if(key == DGLFW_KEY_A){
-    window::WindowRect rect;
-    window->getWindowRect(&rect);
-    window->setWindowRect(&rect);
+  window::WindowRect rect;
+  if(action == DGLFW_PRESS){
+    switch(key){
+      case DGLFW_KEY_ESCAPE:
+        window->setWindowShouldClose(true);
+        break;
+      case DGLFW_KEY_A:
+        window->getWindowRect(&rect);
+        printf("%d,%d\n", rect.x,rect.y);
+        window->setWindowRect(&rect);
+        break;
+     case DGLFW_KEY_P:
+        window->getWindowRect(&rect);
+        fscanf(stdin,"%i %i", &rect.x, &rect.y);
+        window->setWindowRect(&rect);
+        break;
+    }
+   printf("Key pressed: %d,%d,%d,%d\n",key,scancode,action,mods);
   }
-  printf("Key pressed: %d,%d,%d,%d\n",key,scancode,action,mods);
 }
 
 void cursor_pos_callback(window::DWindow*,double x,double y){
@@ -153,10 +164,24 @@ void window_rect_callback(window::DWindow* window, int whatChanged,window::Windo
     printf("Window Size Changed: current: %d,%d passed: %d,%d\n", cur.width,cur.height,rect.width,rect.height);
   }else{
     printf("Window Pos Changed: current: %d,%d passed: %d,%d\n", cur.x,cur.y,rect.x,rect.y);
-    cur.x = rect.x;
-    cur.y = rect.y;
-    window->setWindowRect(&cur);
-    changed = true;
   }
 
+}
+
+void testDWinInfoSpeed(window::DWindow* window){
+  window::DWinInfo info;
+  double rounds = 100000;
+  double start,finish;
+  start = glfwGetTime();
+  for(int i = 0; i < rounds; ++i){
+    info = window->getWinInfo();
+  }
+  finish = glfwGetTime();
+  printf("For %f it took %f, (%f/call)\n", rounds, finish-start, (finish-start)/rounds);
+  start = glfwGetTime();
+  for(int i = 0; i < rounds; ++i){
+    window->getWinInfo(&info);
+  }
+  finish = glfwGetTime();
+  printf("For %f it took %f, (%f/call)\n", rounds, finish-start, (finish-start)/rounds);
 }

@@ -83,6 +83,13 @@ namespace debus{namespace dglfw{
     class DWindowOptions;
     class DWindow;
     typedef RectBase<int> WindowRect;
+
+    struct DWinInfo{
+      WindowRect client_area;
+      int framebuffer_width;
+      int framebuffer_height;
+    };
+
   }; 
 
 

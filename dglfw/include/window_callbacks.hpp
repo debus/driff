@@ -91,6 +91,7 @@ static void __WindowPosFunction(GLFWwindow* window, int x, int y){
   fmap_it f = dwindow->functionMap.find(DGLFW_WINDOW_POS_CALLBACK);
   if(f != dwindow->functionMap.end()){
     WindowRect rect;
+    dwindow->getWindowRect(&rect);
     rect.x = x;
     rect.y = y;
     ((DWindowRectFun)f->second)(dwindow,DGLFW_WINDOW_POSITION_CHANGED,rect);
@@ -103,6 +104,7 @@ static void __WindowSizeFunction(GLFWwindow* window, int width, int height){
   fmap_it f = dwindow->functionMap.find(DGLFW_WINDOW_SIZE_CALLBACK);
   if(f != dwindow->functionMap.end()){
     WindowRect rect;
+    dwindow->getWindowRect(&rect);
     rect.width = width;
     rect.height = height;
     ((DWindowRectFun)f->second)(dwindow,DGLFW_WINDOW_SIZE_CHANGED,rect);

@@ -163,6 +163,20 @@ namespace debus{namespace dglfw{namespace window{
       }
     };
 
+    void getWinInfo(DWinInfo* info){
+      if(info != NULL){
+        getWindowRect(&info->client_area);
+        glfwGetFramebufferSize(this->windowHandle, &info->framebuffer_width, &info->framebuffer_height);
+      }
+    };
+
+    DWinInfo getWinInfo(){
+      DWinInfo ret;
+      getWindowRect(&ret.client_area);
+      glfwGetFramebufferSize(this->windowHandle, &ret.framebuffer_width, &ret.framebuffer_height);
+      return ret;
+    }
+
     static DWindow getCurrentContext(){
       return DWindow(glfwGetCurrentContext());
     };
